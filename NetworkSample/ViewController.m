@@ -7,21 +7,33 @@
 //
 
 #import "ViewController.h"
+#import "AppDelegate.h"
+#import "MediaListResponse.h"
+
+static NSString * const testUserId = @"7013409";
 
 @interface ViewController ()
 
+@property (nonatomic, copy) NSArray *items;
 @end
 
 @implementation ViewController
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    [self requestData];
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+- (void)requestData
+{
+    AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
+    [[appDelegate.apiClient getUserMedia:testUserId success:^(MediaListResponse *responseObject) {
+        self.items = responseObject.data;
+        // TODO: reload interface
+    } error:^(NSError *error) {
+        [[[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
+    }] resume];
 }
 
 @end
